@@ -10,21 +10,22 @@ dotenv.config();
 const app = express();
 
 // ==========================================
-// FIXED CORS Configuration
+// UPDATED CORS - Now includes Render frontend
 // ==========================================
 app.use(cors({
   origin: function(origin, callback) {
     const allowedOrigins = [
       "http://localhost:5173",
       "http://localhost:3000",
-      "https://emi-marketplace.vercel.app"
+      "https://emi-marketplace.vercel.app",
+      "https://emi-marketplace-frontend.onrender.com" // Add your actual Render frontend URL
     ];
     
     // Allow requests with no origin (like mobile apps, Postman, curl, server-to-server)
     if (!origin) return callback(null, true);
     
-    // Allow any vercel.app subdomain for preview deployments
-    if (origin.endsWith('.vercel.app')) {
+    // Allow any .vercel.app or .onrender.com subdomain for preview deployments
+    if (origin.endsWith('.vercel.app') || origin.endsWith('.onrender.com')) {
       return callback(null, true);
     }
     
@@ -32,17 +33,14 @@ app.use(cors({
       callback(null, true);
     } else {
       console.log('⚠️  Origin not allowed:', origin);
-      callback(null, true); // Allow anyway for now - change to false if you want strict mode
+      callback(null, true); // Allow anyway for now
     }
   },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  credentials: false, // Set to false since frontend doesn't need credentials
+  credentials: false,
   optionsSuccessStatus: 200
 }));
-
-// Handle preflight requests - removed wildcard to fix path-to-regexp error
-// CORS middleware already handles OPTIONS automatically
 
 // Body parser
 app.use(express.json());
