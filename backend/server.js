@@ -2,6 +2,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import https from "https";
 import connectDB from "./config/database.js";
 import productRoutes from "./routes/products.js";
 
@@ -10,7 +11,7 @@ dotenv.config();
 const app = express();
 
 // ==========================================
-// UPDATED CORS - Now includes Render frontend
+// CORS Configuration
 // ==========================================
 app.use(cors({
   origin: function(origin, callback) {
@@ -18,13 +19,14 @@ app.use(cors({
       "http://localhost:5173",
       "http://localhost:3000",
       "https://emi-marketplace.vercel.app",
-      "https://emi-marketplace-frontend.onrender.com" // Add your actual Render frontend URL
+      "https://emi-marketplace-frontend.onrender.com",
+      "https://emi-marketplace.onrender.com"
     ];
     
-    // Allow requests with no origin (like mobile apps, Postman, curl, server-to-server)
+    // Allow requests with no origin (Postman, server-to-server)
     if (!origin) return callback(null, true);
     
-    // Allow any .vercel.app or .onrender.com subdomain for preview deployments
+    // Allow any .vercel.app or .onrender.com subdomain
     if (origin.endsWith('.vercel.app') || origin.endsWith('.onrender.com')) {
       return callback(null, true);
     }
@@ -57,7 +59,6 @@ connectDB();
 // ==========================================
 // Routes
 // ==========================================
-
 // Root route
 app.get("/", (req, res) => {
   res.json({ 
@@ -104,14 +105,36 @@ app.use((err, req, res, next) => {
 });
 
 // ==========================================
+// Keep-Alive Function (Prevent Render Sleep)
+// ==========================================
+const keepAlive = () => {
+  const RENDER_URL = process.env.RENDER_URL || 'https://emi-marketplace.onrender.com';
+  
+  setInterval(() => {
+    https.get(`${RENDER_URL}/api/health`, (res) => {
+      if (res.statusCode === 200) {
+        console.log('✅ Keep-alive ping successful');
+      }
+    }).on('error', (err) => {
+      console.error('❌ Keep-alive error:', err.message);
+    });
+  }, 14 * 60 * 1000); // Ping every 14 minutes
+};
+
+// ==========================================
 // Start Server
 // ==========================================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on ${PORT}`);
-  console.log(`✅ MongoDB connected successfully`);
+  console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  
+  // Start keep-alive in production
+  if (process.env.NODE_ENV === 'production') {
+    console.log('⏰ Keep-alive service started (pings every 14 minutes)');
+    keepAlive();
+  }
 });
 
 // Graceful shutdown
