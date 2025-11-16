@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: '*',
   credentials: true
 }));
 app.use(express.json());
@@ -23,7 +23,7 @@ app.use(express.json());
 // Database connection
 connectDB();
 
-// API Routes
+// API Routes MUST come before static files
 app.use('/api/products', productRoutes);
 
 // Health check
@@ -33,10 +33,12 @@ app.get('/api/health', (req, res) => {
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  const frontendPath = path.join(__dirname, '../frontend/dist');
+  app.use(express.static(frontendPath));
   
-  app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  // Catch-all handler for React Router - MUST be last
+  app.use((req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
 
