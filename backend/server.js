@@ -13,17 +13,31 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Middleware
+// ----------- FIXED CORS -----------
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL  // https://emi-marketplace.onrender.com
+];
+
 app.use(cors({
-  origin: '*',
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // Postman support
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.log("❌ Blocked by CORS:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
+
 app.use(express.json());
 
 // Database connection
 connectDB();
 
-// API Routes MUST come before static files
+// API Routes
 app.use('/api/products', productRoutes);
 
 // Health check
@@ -31,20 +45,19 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Serve static files from React build in production
+// Serve React frontend in production
 if (process.env.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, '../frontend/dist');
   app.use(express.static(frontendPath));
-  
-  // Catch-all handler for React Router - MUST be last
+
   app.use((req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
 
-// Error handling middleware
+// Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("🔥 Server Error:", err.stack);
   res.status(500).json({ success: false, error: 'Something went wrong!' });
 });
 
