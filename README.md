@@ -23,13 +23,13 @@ A modern full-stack web application for purchasing products with flexible EMI pl
 **Backend:**
 - Node.js
 - Express.js
-- PostgreSQL / MongoDB
+- MongoDB
 - CORS
 
 **Deployment:**
-- Frontend: Vercel
+- Frontend: Render
 - Backend: Render
-- Database: Render PostgreSQL
+- Database: Mongodb Atlas
 
 ## 📦 Installation & Setup
 
@@ -181,9 +181,9 @@ Retrieve detailed information for a specific product.
 
 ## 🌐 Live Demo
 
-- **Frontend:** [your-vercel-url.vercel.app]
-- **Backend API:** [your-render-url.onrender.com]
-- **Demo Video:** [your-video-link]
+- **Frontend:** https://emi-marketplace-frontend.onrender.com
+- **Backend API:** https://emi-marketplace.onrender.com
+- **Demo Video:** https://drive.google.com/file/d/1ARMSdysFfW5zTAI_MInezmfl-T_5ZyFe/view?usp=drive_link
 
 ## 📸 Screenshots
 
@@ -191,5 +191,5 @@ Retrieve detailed information for a specific product.
 
 ## 👤 Author
 
-MUSKAN KUSHWAHA - [GitHub Profile]
+MUSKAN KUSHWAHA - https://github.com/Muskan3909
 
