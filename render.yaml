@@ -1,17 +1,20 @@
 services:
   - type: web
-    name: emi-marketplace
-    runtime: node
-    region: oregon
-    plan: free
-    buildCommand: |
-      cd backend && npm install
-      cd ../frontend && npm install && npm run build
-    startCommand: cd backend && npm start
+    name: emi-backend
+    env: node
+    rootDir: backend
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGODB_URI
-        sync: false
+
       - key: PORT
         value: 10000
+
+      - key: MONGODB_URI
+        sync: false
+
+      - key: FRONTEND_URL
+        value: https://emi-marketplace.vercel.app
