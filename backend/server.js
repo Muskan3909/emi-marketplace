@@ -41,8 +41,8 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// Handle preflight requests
-app.options('*', cors());
+// Handle preflight requests - removed wildcard to fix path-to-regexp error
+// CORS middleware already handles OPTIONS automatically
 
 // Body parser
 app.use(express.json());
