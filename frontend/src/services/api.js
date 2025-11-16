@@ -1,4 +1,4 @@
-// frontend/src/services/api.js
+
 import axios from 'axios';
 
 // Always use environment variable in production
@@ -11,11 +11,11 @@ console.log("🔗 Using API URL:", API_URL);
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: false, // ✅ CHANGED: Set to false to avoid CORS credential issues
+  withCredentials: false,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000, // Add timeout for better error handling
+  timeout: 60000, // Increased to 60 seconds for Render cold starts
 });
 
 // Add request interceptor for debugging
@@ -39,13 +39,15 @@ api.interceptors.response.use(
   (error) => {
     console.error('❌ API Error:', error.message);
     
-    if (error.response) {
+    if (error.code === 'ECONNABORTED') {
+      console.error('⏱️ Request Timeout - Server might be waking up');
+    } else if (error.response) {
       console.error('Response Error:', {
         status: error.response.status,
         data: error.response.data
       });
     } else if (error.request) {
-      console.error('No Response received');
+      console.error('🌐 No Response received - Check network/server');
     }
     
     return Promise.reject(error);
@@ -53,8 +55,8 @@ api.interceptors.response.use(
 );
 
 export const productAPI = {
-  getAllProducts: () => api.get('/products'), // ✅ CORRECT
-  getProductBySlug: (slug) => api.get(`/products/${slug}`), // ✅ FIXED: Changed from template literal to parentheses
+  getAllProducts: () => api.get('/products'),
+  getProductBySlug: (slug) => api.get(`/products/${slug}`),
 };
 
 export default api;
