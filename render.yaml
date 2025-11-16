@@ -17,4 +17,4 @@ services:
         sync: false
 
       - key: FRONTEND_URL
-        value: https://emi-marketplace.vercel.app
+        value: https://emi-marketplace-frontend.onrender.com
